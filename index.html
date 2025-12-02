@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casa Domótica - Integrantes: Palacios, Tuaquisa y Garofalo</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Roboto', sans-serif; }
+
+        .sensor-card {
+            transition: all 0.3s ease;
+        }
+        .sensor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        /* Para colores dinámicos del icono */
+        .thermo-icon {
+            transition: color 0.4s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="bg-blue-900 text-white shadow-lg border-b-4 border-red-600">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+
+            <div class="flex items-center gap-3">
+                <div class="bg-white p-2 rounded-full">
+                    <i data-lucide="home" class="w-8 h-8 text-blue-900"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">CASA DOMÓTICA</h1>
+                    <p class="text-xs text-blue-200 font-semibold tracking-widest">
+                        Palacios | Tuaquisa | Garofalo
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 bg-blue-950/50 px-4 py-2 rounded-lg border border-blue-400/30">
+                <div class="relative flex h-3 w-3">
+                  <span id="pingDot" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 hidden"></span>
+                  <span id="staticDot" class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </div>
+                <span id="statusText" class="text-sm font-mono text-red-200">Desconectado</span>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- INFO BAR -->
+    <div class="bg-white border-b border-slate-200 shadow-sm">
+        <div class="container mx-auto px-4 py-2 flex flex-wrap justify-between items-center text-sm text-slate-600">
+            <div class="flex items-center gap-2">
+                <i data-lucide="user-circle" class="w-4 h-4 text-red-600"></i>
+                <span class="font-medium">Proyecto Casa Domótica</span>
+            </div>
+            <div class="flex gap-4 font-mono text-slate-500">
+                <span id="dateDisplay">--/--/----</span>
+                <span id="timeDisplay" class="text-blue-700 font-bold">--:--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-slate-800">Monitoreo de Temperatura del Hogar</h2>
+            <p class="text-slate-500 mt-1">Domótica en ESP32 - Sistema de Climatización</p>
+        </div>
+
+        <!-- PROMEDIO -->
+        <div class="bg-white p-6 rounded-xl shadow border border-slate-200 mb-8 text-center">
+            <h3 class="text-xl font-bold text-blue-700">Promedio General</h3>
+            <p id="promedio" class="text-5xl font-bold text-slate-800 mt-3">--</p>
+        </div>
+
+
+        <!-- GRID SENSORES -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <!-- SALA - VERDE -->
+            <div class="sensor-card bg-white rounded-xl overflow-hidden shadow border border-slate-200">
+                <div class="bg-green-600 p-3 flex justify-between items-center">
+                    <h3 class="text-white font-bold">SALA</h3>
+                    <i id="icon1" data-lucide="thermometer" class="thermo-icon text-green-200 w-5 h-5"></i>
+                </div>
+
+                <div class="p-6 text-center">
+                    <div id="trend1" class="text-sm font-bold mb-2 text-slate-400">—</div>
+                    <div id="val1" class="text-5xl font-bold text-slate-800">--</div>
+                    <div class="text-slate-400 mt-2 text-sm">°C</div>
+                </div>
+            </div>
+
+            <!-- DORMITORIO - AMARILLO -->
+            <div class="sensor-card bg-white rounded-xl overflow-hidden shadow border border-slate-200">
+                <div class="bg-yellow-500 p-3 flex justify-between items-center">
+                    <h3 class="text-white font-bold">DORMITORIO</h3>
+                    <i id="icon2" data-lucide="thermometer" class="thermo-icon text-yellow-200 w-5 h-5"></i>
+                </div>
+
+                <div class="p-6 text-center">
+                    <div id="trend2" class="text-sm font-bold mb-2 text-slate-400">—</div>
+                    <div id="val2" class="text-5xl font-bold text-slate-800">--</div>
+                    <div class="text-slate-400 mt-2 text-sm">°C</div>
+                </div>
+            </div>
+
+            <!-- GARAJE - VIOLETA -->
+            <div class="sensor-card bg-white rounded-xl overflow-hidden shadow border border-slate-200">
+                <div class="bg-purple-600 p-3 flex justify-between items-center">
+                    <h3 class="text-white font-bold">GARAJE</h3>
+                    <i id="icon3" data-lucide="thermometer" class="thermo-icon text-purple-200 w-5 h-5"></i>
+                </div>
+
+                <div class="p-6 text-center">
+                    <div id="trend3" class="text-sm font-bold mb-2 text-slate-400">—</div>
+                    <div id="val3" class="text-5xl font-bold text-slate-800">--</div>
+                    <div class="text-slate-400 mt-2 text-sm">°C</div>
+                </div>
+            </div>
+
+            <!-- CINE - NARANJA -->
+            <div class="sensor-card bg-white rounded-xl overflow-hidden shadow border border-slate-200">
+                <div class="bg-orange-600 p-3 flex justify-between items-center">
+                    <h3 class="text-white font-bold">CINE</h3>
+                    <i id="icon4" data-lucide="thermometer" class="thermo-icon text-orange-200 w-5 h-5"></i>
+                </div>
+
+                <div class="p-6 text-center">
+                    <div id="trend4" class="text-sm font-bold mb-2 text-slate-400">—</div>
+                    <div id="val4" class="text-5xl font-bold text-slate-800">--</div>
+                    <div class="text-slate-400 mt-2 text-sm">°C</div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- BOTÓN -->
+        <div class="mt-12 flex justify-center">
+            <button id="connectBtn" onclick="toggleConnection()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 px-10 rounded-full shadow-xl flex items-center gap-3 transition-transform hover:scale-105 active:scale-95">
+                <i data-lucide="bluetooth" class="w-6 h-6"></i>
+                <span>CONECTAR DISPOSITIVO</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-500 py-6 text-center text-xs border-t-4 border-red-600">
+        <p>© 2025 Proyecto de Domótica Inteligente</p>
+    </footer>
+
+
+<!-- JAVASCRIPT -->
+<script>
+
+    lucide.createIcons();
+
+    const colors = {
+        up: "#22c55e",     // Verde
+        down: "#2563eb",   // Azul
+        stable: "#6b7280"  // Gris
+    };
+
+    // RELÓJ
+    function updateClock() {
+        const now = new Date();
+        document.getElementById("dateDisplay").textContent = now.toLocaleDateString("es-EC", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+        document.getElementById("timeDisplay").textContent = now.toLocaleTimeString("es-EC");
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // UUID BLE
+    const serviceUuid = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
+    const characteristicUuid = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
+
+    let bluetoothDevice;
+    let bleCharacteristic;
+
+    const val1 = document.getElementById("val1");
+    const val2 = document.getElementById("val2");
+    const val3 = document.getElementById("val3");
+    const val4 = document.getElementById("val4");
+
+    const trend1 = document.getElementById("trend1");
+    const trend2 = document.getElementById("trend2");
+    const trend3 = document.getElementById("trend3");
+    const trend4 = document.getElementById("trend4");
+
+    const icon1 = document.getElementById("icon1");
+    const icon2 = document.getElementById("icon2");
+    const icon3 = document.getElementById("icon3");
+    const icon4 = document.getElementById("icon4");
+
+    const promedio = document.getElementById("promedio");
+
+    let last = { s1: null, s2: null, s3: null, s4: null };
+
+
+
+    // Conectar
+    async function toggleConnection() {
+        if (bluetoothDevice && bluetoothDevice.gatt.connected) disconnect();
+        else connect();
+    }
+
+    async function connect() {
+        try {
+            connectBtn.innerHTML = '<span class="animate-spin">⏳</span> BUSCANDO...';
+
+            bluetoothDevice = await navigator.bluetooth.requestDevice({
+                filters: [{ name: "TUVN_Termometros" }],
+                optionalServices: [serviceUuid]
+            });
+
+            const server = await bluetoothDevice.gatt.connect();
+            const service = await server.getPrimaryService(serviceUuid);
+            bleCharacteristic = await service.getCharacteristic(characteristicUuid);
+
+            await bleCharacteristic.startNotifications();
+            bleCharacteristic.addEventListener("characteristicvaluechanged", handleData);
+
+            updateUIConnected();
+        } catch {
+            updateUIDisconnected();
+        }
+    }
+
+    function disconnect() {
+        if (bluetoothDevice && bluetoothDevice.gatt.connected) {
+            bluetoothDevice.gatt.disconnect();
+        }
+    }
+
+
+    // Manejo de Datos
+    function handleData(event) {
+        const decoder = new TextDecoder();
+        const json = decoder.decode(event.target.value);
+
+        try {
+            const d = JSON.parse(json);
+
+            updateSensor(val1, trend1, icon1, d.s1, "s1");
+            updateSensor(val2, trend2, icon2, d.s2, "s2");
+            updateSensor(val3, trend3, icon3, d.s3, "s3");
+            updateSensor(val4, trend4, icon4, d.s4, "s4");
+
+            const avg = (d.s1 + d.s2 + d.s3 + d.s4) / 4;
+            promedio.innerText = avg.toFixed(1);
+
+        } catch(e) {}
+    }
+
+
+    // ACTUALIZAR SENSOR
+    function updateSensor(label, trendLabel, icon, newVal, key) {
+
+        if (newVal == null) return;
+
+        if (last[key] === null) {
+            trendLabel.textContent = "—";
+            icon.style.color = colors.stable;
+        }
+        else if (newVal > last[key]) {
+            trendLabel.textContent = "Subiendo ↑";
+            trendLabel.className = "text-green-600 font-bold";
+            icon.style.color = colors.up;
+        }
+        else if (newVal < last[key]) {
+            trendLabel.textContent = "Bajando ↓";
+            trendLabel.className = "text-blue-600 font-bold";
+            icon.style.color = colors.down;
+        }
+        else {
+            trendLabel.textContent = "Estable •";
+            trendLabel.className = "text-slate-400 font-bold";
+            icon.style.color = colors.stable;
+        }
+
+        label.innerText = newVal.toFixed(1);
+        last[key] = newVal;
+    }
+
+
+
+    // UI
+    function updateUIConnected() {
+        connectBtn.innerHTML = "DESCONECTAR SISTEMA";
+        connectBtn.classList.add("bg-red-600");
+        connectBtn.classList.remove("bg-slate-800");
+
+        statusText.innerText = "CONECTADO";
+        statusText.classList.replace("text-red-200", "text-green-300");
+        staticDot.classList.replace("bg-red-500", "bg-green-500");
+    }
+
+    function updateUIDisconnected() {
+        connectBtn.innerHTML = '<i data-lucide="bluetooth" class="w-6 h-6"></i> CONECTAR DISPOSITIVO';
+        connectBtn.classList.add("bg-slate-800");
+        connectBtn.classList.remove("bg-red-600");
+
+        statusText.innerText = "DESCONECTADO";
+        statusText.classList.replace("text-green-300", "text-red-200");
+        staticDot.classList.replace("bg-green-500", "bg-red-500");
+
+        val1.innerText = val2.innerText = val3.innerText = val4.innerText = "--";
+        promedio.innerText = "--";
+    }
+
+</script>
+
+</body>
+</html>
